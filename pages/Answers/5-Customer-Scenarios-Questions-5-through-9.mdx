@@ -1,0 +1,109 @@
+
+## Customer Scenarios (questions 5 through 9)
+
+### 5. Imagine a customer writes in requesting help with a build issue on a framework or technology that you've not seen before. How would you begin troubleshooting this and what questions would you ask the customer to understand the situation better?
+
+My answer: 
+> Thank you for reaching out with this issue. I know how frustrating it can be when a build doesn’t go as planned, but rest assured, I’m here to help you get everything back on track. Could you please provide a few more details to help us resolve this quicker?
+>
+> - What exact error message did you see during the build process?
+> - Which version of the framework are you using right now?
+> - Have there been any recent changes or updates to your codebase or build configuration?
+> - Could you walk me through the steps you took just before encountering the error?
+>
+> This information will really help me understand what’s happening and reproduce the error on my side.
+
+### 6. The customer from question 5 replies to your response with the below:
+      
+“I’m so frustrated. I’ve been trying to make this work for hours and I just can’t figure it out. It must be a platform issue so just fix it for me instead of asking me questions.”
+Please write a follow-up reply to the customer.
+
+My answer:
+> I completely understand where you’re coming from. Getting a build stuck for several hours could be very disappointing. To ensure we can address this efficiently with our engineering team, we still need a few more details about what you’re experiencing. Could we possibly schedule a quick call or continue this conversation at a time that’s more convenient for you? I’ll keep you updated on my progress as we investigate this issue
+
+### 7. A customer writes in to the Helpdesk asking "How do I do a redirect from the /blog path to https://example.com?" Please write a reply to the customer. Feel free to add any information about your decision making process after the reply.
+
+My answer: 
+
+> Hello, thank you for reaching out!
+>
+> To implement this redirect on your project, you can do so by adding a new rule to your `vercel.json` configuration file. Here are the steps for a simple, static redirect on a Vercel-hosted site:
+>
+> 1. Open your `vercel.json` file. If you don’t have this file in your project yet, you can create it in the root of your project directory.
+> 2. Add the following configuration to the file:
+```json
+{
+  "redirects": [
+    {
+      "source": "/blog",
+      "destination": "https://example.com",
+      "permanent": true,
+      "statusCode": 301
+    }
+  ]
+}
+```
+> 3. Save the changes and deploy your project.
+>
+> Depending on your project goals, there are a couple of ways you could set up a redirect, so I strongly encourage you to review our documentation which covers different kinds of redirects. Feel free to reach out if you have any questions!
+>
+> [Vercel Documentation on Redirects](https://vercel.com/docs/projects/project-configuration#redirects)
+
+### 8. A customer is creating a site and would like their project not to be indexed by search engines. Please write a reply to the customer. Feel free to add any information about your decision making process after the reply. 
+
+My answer: 
+
+> To prevent search engines from indexing certain parts of your website, you can use the `X-Robots-Tag` HTTP header. This header is automatically set to `noindex` for all preview deployments, ensuring that search engines do not accidentally index these URLs.
+>
+> However, when a custom domain is assigned to a Git branch, this automatic setting is not applied, and the `X-Robots-Tag` header is not set.
+>
+> If you wish to maintain the `noindex` setting for your custom domain, you can manually inject this response header using your framework's built-in methods. Here's how you can  do this in a Next.js app:
+> 
+```javascript
+ module.exports = {
+   async headers() {
+     const headers = [];
+     if (process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview') {
+       headers.push({
+         headers: [
+           {
+             key: 'X-Robots-Tag',
+             value: 'noindex',
+           },
+         ],
+         source: '/:path*',
+       });
+     }
+     return headers;
+   },
+};
+```
+
+> If your framework does not support injecting response headers directly, you can modify the `headers` object in your `vercel.json` file:
+
+```json
+{
+   "headers": [
+     {
+       "source": "/",
+       "has": [
+         {
+           "type": "host",
+           "value": "example.com"
+         }
+       ],
+       "headers" : [
+         {
+           "key" : "X-Robots-Tag",
+           "value" : "noindex"
+         }
+       ]
+     }
+   ]
+}
+```
+>
+> Please note that it is always recommended to use your framework's built-in methods to inject headers whenever possible. The use of `vercel.json` for this purpose should be  considered a last resort as it may lead to complications.
+
+
+### 9. What do you think is one of the most common problems which customers ask Vercel for help with? How would you help customers to overcome common problems, short-term and long-term?

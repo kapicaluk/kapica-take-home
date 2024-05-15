@@ -1,0 +1,15 @@
+# Describe how you solved a challenge or technical issue that you faced in a previous role (preferably in a previous support role). How did you determine that your solution was successful?
+
+In my previous role as a Senior Support Engineer at Netflix, I was confronted with a challenging situation where a significant number of our users were experiencing inspection failures for the VFX assets they were submitting for one of our workflows.
+
+The issue occurred on the 4th of July when our domain experts, who possessed the necessary industry knowledge to assess whether a given video asset was up to spec, were unavailable to provide additional context regarding the provided assets (i.e., confirming they were up to spec and expected to be supported).
+
+Our Tier-1 team received an uptick in reports requesting context on failures for assets that seemingly should have been processed through the pipeline without issues. Based on system outputs, it wasn’t possible to determine if the given files were corrupted without downloading them. These assets were several hundred gigabytes in size, so downloading them would also take a long time.
+
+To address this, I first gathered all relevant data, such as logs from the workflow app and the dependent inspection service. I checked the system health of the relevant services and found that all of them had healthy server instances; the time series tool Atlas (similar to Grafana) showed typical traffic.
+
+Upon reviewing the inspection service outputs, I determined that the number of inspection errors had spiked significantly on the Friday of the week before. I correlated this with system deployments to see if they corresponded with any changes. It turned out that the service responsible for gathering inspection results and attributing them to submitted assets had deployed changes on the same date when the spike in errors occurred.
+
+This discovery prompted me to further investigate how we treated similar inspections in the past. Using Elasticsearch, I was able to find several historical submissions that had passed inspections. I migrated these to our sandbox/staging environment and resubmitted them. The inspection responses were exactly the same (returning the asset details with a handful of warnings); however, this time, the service responsible for interpreting the results and assigning them to the asset interpreted this as a failure.
+
+This was enough to engage the appropriate engineering team to inquire further about the reasoning behind their most recent change. It turned out that a different business segment app had requested a change (they wanted explicit failures for still image inspections), but the engineering team had inadvertently extended this to all inspections. This incident helped us establish a healthy baseline for such errors, which could allow us to identify similar issues more quickly in the future.
